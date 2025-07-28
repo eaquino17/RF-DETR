@@ -63,9 +63,8 @@ Synthetic bounding boxes generated per class in YOLO format:
 # Train with default parameters
 python train.py --model rtdetr-s --epochs 50 --batch 16
 
-# Available models: rtdetr-s, rtdetr-m, rtdetr-l
 
-Training configuration:
+### Training configuration:
 
 Optimizer: AdamW
 
