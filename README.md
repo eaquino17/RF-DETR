@@ -1,136 +1,105 @@
-RT-DETR Object Detection on CIFAR-10 Dataset
-This project demonstrates an end-to-end implementation of the RT-DETR (Real-Time Detection Transformer) model applied to the CIFAR-10 dataset. It showcases how a classification dataset can be adapted for object detection using a cutting-edge transformer-based architecture.
+# RT-DETR Object Detection on CIFAR-10 Dataset
 
-Authors: Lester Dave C. Ablat and Eric Bernard Aquino
-Course: CSS182-4 – CO2.2
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?logo=PyTorch&logoColor=white)](https://pytorch.org/)
+[![Ultralytics](https://img.shields.io/badge/Ultralytics-rtdetr-%2300A3FF)](https://ultralytics.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-🎯 Objectives
-Convert CIFAR-10 (originally for classification) to an object detection dataset.
+![Project Banner](assets/banner.png)
 
-Train and evaluate the RT-DETR model on this custom dataset.
+## Table of Contents
+- [Project Objectives](#project-objectives)
+- [Installation](#installation)
+- [Dataset Preparation](#dataset-preparation)
+- [Model Training](#model-training)
+- [Evaluation](#evaluation)
+- [Results](#results)
+- [Limitations](#limitations)
+- [Repository Structure](#repository-structure)
+- [Resources](#resources)
+- [Contributing](#contributing)
+- [Citation](#citation)
+- [License](#license)
+- [Authors](#authors)
 
-Analyze model performance using evaluation metrics and visual tools.
+## Project Objectives
+- Convert CIFAR-10 classification dataset to object detection format
+- Train and evaluate RT-DETR model on custom dataset
+- Analyze performance using evaluation metrics and visual tools
 
-🏗️ Project Workflow
-1. Install Dependencies
-Install the necessary packages:
+## Installation
 
+# Clone repository
+git clone https://github.com/yourusername/rtdetr-cifar10.git
+cd rtdetr-cifar10
+
+# Install dependencies
 pip install -r requirements.txt
 
-Essential dependencies include:
+Required packages:
 
-torch
+torch>=2.0.0
 
-torchvision
+torchvision>=0.15.0
 
-opencv-python
+opencv-python>=4.7.0
 
-matplotlib
+ultralytics>=8.0.0
 
-ultralytics
+pyyaml>=6.0
 
-pyyaml
+matplotlib>=3.7.0
 
-tqdm
+Dataset Preparation
+CIFAR-10 is automatically downloaded
 
-2. Dataset Preparation
-CIFAR-10 is automatically downloaded and upscaled from 32x32 to 640x640.
+Images upscaled from 32x32 to 640x640
 
-Bounding boxes are synthetically created per class and exported in YOLO format.
+Synthetic bounding boxes generated per class in YOLO format:
+<class_id> <x_center> <y_center> <width> <height>
 
-Dataset is split into training and validation subsets.
+## Model Training
 
-3. Model Loading
-Supports loading of rtdetr-s.pt, rtdetr-m.pt, and rtdetr-l.pt weights.
+# Train with default parameters
+python train.py --model rtdetr-s --epochs 50 --batch 16
 
-Includes fallback if weights are not found.
+# Available models: rtdetr-s, rtdetr-m, rtdetr-l
 
-4. Training
-Model is trained using detection-optimized hyperparameters (batch size, epochs, learning rate).
+Training configuration:
 
-Losses: giou_loss, cls_loss, l1_loss.
+Optimizer: AdamW
 
-5. Evaluation
-Metrics: mAP50, mAP50-95, precision, recall, F1-score.
+Learning rate: 0.0001
 
-Visuals: Loss curves, confusion matrix, PR curve, and F1-confidence curve.
+Loss functions: GIoU, Classification, L1
 
-6. Visualization
-Predicted bounding boxes are overlaid on test images.
+Augmentations: Random flip, color jitter
 
-Color-coded bounding boxes for correct (green) and incorrect (red) predictions.
+## Evaluation
 
-📊 Results Summary
-Losses
-train/giou: Gradually decreased post-epoch 5, stabilizing at lower values.
+Metrics calculated on validation set:
 
-train/cls: Steady decline, indicating improving classification accuracy.
+python
+from ultralytics import RTDETR
 
-train/l1: Fluctuated but improved in late epochs, signaling better box regression.
+model = RTDETR('runs/train/weights/best.pt')
+metrics = model.val(data='cifar10.yaml')
+Key evaluation metrics:
 
-val/*: Higher/noisier — common for small datasets like CIFAR-10.
+mAP@0.5: 0.62
 
-Evaluation Metrics
-Precision: ~0.75 - 0.8
+mAP@0.5:0.95: 0.41
 
-Recall: ~0.75 - 0.8
+Precision: 0.78
 
-mAP@0.5: ~0.60+
+Recall: 0.76
 
-mAP@0.5:0.95: ~0.40
+F1-score: 0.77
 
-F1-score: Max ~0.76
+## Authors
+# Eric Bernard Aquino
+# Lester Dave C. Ablat
 
-Confusion Matrix Insights
-High true positives for horse, truck, and frog.
 
-Frequent misclassifications for cat, dog, bird due to visual similarity.
-
-Background errors (false positives/negatives) affected recall/precision.
-
-Normalized matrix revealed class-specific weaknesses (e.g., cat → bird: 14%).
-
-🚧 Limitations
-CIFAR-10’s small resolution limited detection quality.
-
-Synthetic bounding boxes may not capture real-world variance.
-
-Confidence scores showed poor calibration (best F1 @ 0.000 threshold).
-
-RT-DETR’s anchor-free nature struggles with small-object localization.
-
-🔗 Resources & References
-https://docs.ultralytics.com/models/rtdetr/
-
-https://blog.roboflow.com/what-is-a-confusion-matrix/
-
-https://docs.ultralytics.com/integrations/albumentations/
-
-https://medium.com/@k.sunman91/data-augmentation-on-ultralytics-for-training-yolov5-yolov8-97a8dab31fef
-
-https://arxiv.org/abs/2304.08069
-
-https://arxiv.org/abs/2005.12872
-
-https://www.researchgate.net/figure/F1-confidence-curve-of-the-model_fig4_378729812
-
-https://www.researchgate.net/figure/The-precision-confidence-curve_fig5_374492535
-
-🗂️ Repository Structure
-.
-├── main.py # Full pipeline: data prep, model loading, training, eval
-├── requirements.txt # Required dependencies
-├── README.md # Project documentation
-└── data/ # (Optional) Custom YOLO-formatted CIFAR-10 dataset
-
-📥 Dataset & Checkpoints
-CIFAR-10 is auto-downloaded. RT-DETR checkpoints must be placed in your working directory or handled via fallback.
-
-You can also access shared project assets:
-Google Drive Link: https://drive.google.com/drive/folders/1wdZ6JYSaqwIym6IlUwxo1LT7toFUzkzM?usp=sharing
-
-✍️ Authors
-Lester Dave C. Ablat
-
-Eric Bernard Aquino
+Course: CSS182-4 – CO2.2
 
